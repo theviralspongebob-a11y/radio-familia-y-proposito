@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📻 Radio Familia y Propósito - En Vivo</title>
+  <meta name="description" content="Escucha Radio Familia y Propósito en vivo. Bendición, fe y esperanza 24/7.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      padding: 20px;
+    }
+    .player-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px 30px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .logo {
+      width: 150px; height: 150px; object-fit: contain;
+      margin: 0 auto 25px; display: block; border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1); padding: 10px;
+      transition: transform 0.3s ease;
+    }
+    .logo:hover { transform: scale(1.03); }
+    .station-name {
+      font-size: 1.5rem; font-weight: 600; margin-bottom: 8px;
+      color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .status {
+      font-size: 0.9rem; color: #a0a0c0; margin-bottom: 25px; min-height: 20px;
+    }
+    .status.live { color: #00d1a0; font-weight: 500; }
+    .play-btn {
+      width: 120px; height: 120px; border-radius: 50%; border: none;
+      background: linear-gradient(145deg, #e94560, #c23a51);
+      color: white; font-size: 1.8rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 30px;
+      box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+      transition: all 0.3s ease;
+    }
+    .play-btn:hover { transform: scale(1.05); }
+    .play-btn:active { transform: scale(0.98); }
+    .play-btn.playing {
+      background: linear-gradient(145deg, #00d1a0, #00b388);
+      box-shadow: 0 10px 30px rgba(0, 209, 160, 0.4);
+    }
+    .marquee-container {
+      background: rgba(0, 0, 0, 0.2); border-radius: 12px;
+      padding: 15px; margin-top: 10px; overflow: hidden; min-height: 60px;
+      display: flex; align-items: center;
+    }
+    .marquee {
+      display: inline-block; white-space: nowrap;
+      animation: scroll-left 25s linear infinite;
+      font-size: 1.1rem; color: #e0e0ff; padding-left: 100%;
+    }
+    .marquee.paused { animation-play-state: paused; }
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    .volume-control {
+      margin-top: 25px; display: flex; align-items: center;
+      justify-content: center; gap: 12px;
+    }
+    .volume-control input { width: 120px; accent-color: #e94560; }
+    .volume-icon { font-size: 1.3rem; }
+    @media (max-width: 480px) {
+      .player-container { padding: 30px 20px; }
+      .logo { width: 120px; height: 120px; }
+      .play-btn { width: 100px; height: 100px; font-size: 1.5rem; }
+      .station-name { font-size: 1.3rem; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.6; }
+    }
+    .live-indicator {
+      display: inline-block; width: 10px; height: 10px;
+      background: #00d1a0; border-radius: 50%;
+      margin-right: 6px; animation: pulse 1.5s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="player-container">
+    <!-- 🔹 LOGO -->
+    <img 
+      src="https://i.imgur.com/McIzhvm.jpeg" 
+      alt="Logo Radio Familia y Propósito" 
+      class="logo" 
+      width="150" height="150"
+      loading="lazy"
+      onerror="this.src='https://via.placeholder.com/150x150/4a4a8a/ffffff?text=⛪'"
+    >
+
+    <!-- 🔹 NOMBRE -->
+    <div class="station-name">📻 Radio Familia y Propósito</div>
+    <div class="status" id="status"><span class="live-indicator"></span>En vivo</div>
+
+    <!-- 🔹 BOTÓN PLAY -->
+    <button class="play-btn" id="playBtn" aria-label="Reproducir">▶</button>
+
+    <!-- 🔹 TEXTO SCROLLING CON VERSÍCULOS -->
+    <div class="marquee-container">
+      <div class="marquee" id="scrollingText">
+        🎵 Bienvenido a Radio Familia y Propósito • "Porque yo sé los planes que tengo para ti, planes de bienestar y no de calamidad" - Jeremías 29:11 • "Todo lo puedo en Cristo que me fortalece" - Filipenses 4:13 • "Jehová es mi pastor; nada me faltará" - Salmos 23:1 • 
+      </div>
+    </div>
+
+    <!-- 🔹 VOLUMEN -->
+    <div class="volume-control">
+      <span class="volume-icon">🔈</span>
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
+      <span class="volume-icon">🔊</span>
+    </div>
+  </div>
+
+  <!-- 🔹 AUDIO STREAM - URL VERIFICADA ✅ -->
+  <audio id="radioStream" preload="none">
+    <source src="https://uk14freenew.listen2myradio.com/live.mp3?typeportmount=s1_8594_stream_848110616" type="audio/mpeg">
+    Tu navegador no soporta el elemento de audio.
+  </audio>
+
+  <script>
+    const audio = document.getElementById('radioStream');
+    const playBtn = document.getElementById('playBtn');
+    const statusEl = document.getElementById('status');
+    const scrollingText = document.getElementById('scrollingText');
+    const volumeSlider = document.getElementById('volumeSlider');
+    let isPlaying = false;
+
+    // === PLAY/PAUSE ===
+    playBtn.addEventListener('click', async () => {
+      if (!isPlaying) {
+        try {
+          await audio.play();
+          isPlaying = true;
+          playBtn.innerHTML = "⏸";
+          playBtn.classList.add('playing');
+          statusEl.innerHTML = '<span class="live-indicator"></span>🔊 Reproduciendo...';
+          statusEl.classList.add('live');
+          scrollingText.classList.remove('paused');
+        } catch (err) {
+          console.error("Error:", err);
+          statusEl.textContent = "⚠️ Verifica tu conexión";
+          statusEl.classList.remove('live');
+        }
+      } else {
+        audio.pause();
+        isPlaying = false;
+        playBtn.innerHTML = "▶";
+        playBtn.classList.remove('playing');
+        statusEl.textContent = "⏸ Pausado";
+        statusEl.classList.remove('live');
+        scrollingText.classList.add('paused');
+      }
+    });
+
+    // === VOLUMEN ===
+    volumeSlider.addEventListener('input', (e) => {
+      audio.volume = parseFloat(e.target.value);
+    });
+
+    // === TECLADO (Space para play/pause) ===
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && document.activeElement !== volumeSlider) {
+        e.preventDefault();
+        playBtn.click();
+      }
+    });
+
+    // === INICIALIZAR VOLUMEN ===
+    audio.volume = 0.8;
+  </script>
+</body>
+</html>
